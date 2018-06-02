@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	// ErrInvalidStructure happends when the the caller passes an invalid structure.
+	// ErrInvalidStructure happens when the the caller passes an invalid structure.
 	ErrInvalidStructure = errors.New("was expected to get an adventure structure")
-	// ErrInvalidTemplatePath happends when the the caller passes a path and we can't find the file.
+	// ErrInvalidTemplatePath happens when the the caller passes a path and we can't find the file.
 	ErrInvalidTemplatePath = errors.New("couldn't open the file")
 )
 
@@ -22,7 +22,7 @@ type Game struct {
 	tmpl *template.Template
 }
 
-// Adventure represent's the basic struct for an Adventure.
+// Adventure represents the basic struct for an Adventure.
 type Adventure struct {
 	Title   string   `json:"title,omitempty"`
 	Story   []string `json:"story,omitempty"`
