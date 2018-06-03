@@ -2,7 +2,6 @@ package urlshort
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -54,7 +53,6 @@ func YAMLHandler(r io.Reader, fallback http.Handler) (http.HandlerFunc, error) {
 
 	err := yaml.NewDecoder(r).Decode(&p)
 	if err != nil {
-		log.Fatalf("Error parssing the yaml: %v", err)
 		return nil, err
 	}
 
