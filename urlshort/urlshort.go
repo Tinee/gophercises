@@ -8,10 +8,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type PathToUrl struct {
+// PathToURL represent the core object in this package.
+type PathToURL struct {
 	Path string `yaml:"path,omitempty"`
 	URL  string `yaml:"url,omitempty"`
 }
+
+// Paths is a slice of PathToUrl
+type Paths []PathToURL
 
 // MapHandler will return an http.HandlerFunc (which also
 // implements http.Handler) that will attempt to map any
@@ -48,17 +52,21 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // See MapHandler to create a similar http.HandlerFunc via
 // a mapping of paths to urls.
 func YAMLHandler(r io.Reader, fallback http.Handler) (http.HandlerFunc, error) {
-	p := []PathToUrl{}
-	pm := make(map[string]string)
+	p := Paths{}
 
 	err := yaml.NewDecoder(r).Decode(&p)
 	if err != nil {
 		return nil, err
 	}
 
+	return MapHandler(p.toMap(), fallback), nil
+}
+
+func (p Paths) toMap() map[string]string {
+	pm := make(map[string]string)
+
 	for _, v := range p {
 		pm[v.Path] = v.URL
 	}
-
-	return MapHandler(pm, fallback), nil
+	return pm
 }
