@@ -15,19 +15,19 @@ type TodoService struct {
 }
 
 // Create mocks the underlaying Create on TodoService
-func (s *TodoService) Create(t domain.Todo) error {
+func (s TodoService) Create(t domain.Todo) error {
 	s.CreateTodoInvoked = true
 	return s.CreateTodoFn(t)
 }
 
 // Delete mocks the underlaying Delete on TodoService
-func (s *TodoService) Delete(id int) error {
+func (s TodoService) Delete(id int) error {
 	s.CreateTodoInvoked = true
 	return s.DeleteTodoFn(id)
 }
 
 // All mocks the underlaying All on TodoService
-func (s *TodoService) All() ([]domain.Todo, error) {
+func (s TodoService) All() ([]domain.Todo, error) {
 	s.AllInvoked = true
 	return s.AllFn()
 }

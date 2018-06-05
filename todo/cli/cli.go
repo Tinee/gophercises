@@ -19,7 +19,7 @@ type Cli struct {
 	Action
 }
 
-func NewCli(
+func New(
 	s domain.TodoService,
 	l *log.Logger,
 	a Action,
@@ -36,16 +36,14 @@ func NewCli(
 func (c *Cli) Exectue() error {
 	switch strings.ToLower(c.Kind) {
 	case "list":
-		c.handleList()
+		return c.handleList()
 	case "create":
-		c.handleCreate()
+		return c.handleCreate()
 	case "do":
-		c.handleDo()
+		return c.handleDo()
 	default:
 		return domain.ErrInvalidAction
 	}
-
-	return nil
 }
 
 func (c *Cli) handleList() error {
@@ -64,7 +62,8 @@ func (c *Cli) handleList() error {
 func (c *Cli) handleDo() error {
 	id, err := strconv.Atoi(c.Arg)
 	if err != nil {
-		c.log.Fatal("Error: invalid argument")
+		c.log.Println("Error: invalid argument")
+		return err
 	}
 
 	err = c.s.Delete(id)
