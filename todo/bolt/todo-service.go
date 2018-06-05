@@ -2,7 +2,6 @@ package bolt
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/json"
 
 	"github.com/Tinee/gophercises/todo/domain"
@@ -61,18 +60,10 @@ func (ts TodoService) All() ([]domain.Todo, error) {
 		todos = append(todos, todo)
 	}
 
-	// if v, err := json.Marshal(t); err != nil {
-	// 	return err
-	// } else if err := b.Put([]byte(t.ID), v); err != nil {
-	// 	return err
-	// }
-
 	return todos, nil
 }
 
-// itob returns an 8-byte big endian representation of v.
-func itob(v int) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b
+// Delete removes a todo
+func (ts TodoService) Delete(id int) error {
+	return nil
 }

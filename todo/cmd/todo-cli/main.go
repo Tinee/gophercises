@@ -2,11 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/Tinee/gophercises/todo/handler"
+	"github.com/Tinee/gophercises/todo/cli"
 
 	"github.com/Tinee/gophercises/todo/bolt"
 )
@@ -17,9 +16,8 @@ func main() {
 		err    error
 		action = flag.Arg(0)
 		c      = bolt.NewClient("todo.db")
-		logger = log.New(os.Stdout, "", log.LstdFlags)
+		logger = log.New(os.Stdout, "", 0)
 	)
-	fmt.Println(action)
 
 	defer c.Close()
 	err = c.Open()
@@ -28,9 +26,7 @@ func main() {
 	}
 	svc := c.TodoService()
 
-	h := handler.NewHandler(action, svc, logger)
-	err = h.Exectue()
-	if err != nil {
+	h := cli.NewCli(svc, logger)
 
-	}
+	err = h.Exectue(action)
 }
