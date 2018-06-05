@@ -3,6 +3,7 @@ package bolt
 import (
 	"bytes"
 	"encoding/json"
+	"strconv"
 
 	"github.com/Tinee/gophercises/todo/domain"
 )
@@ -65,5 +66,19 @@ func (ts TodoService) All() ([]domain.Todo, error) {
 
 // Delete removes a todo
 func (ts TodoService) Delete(id int) error {
-	return nil
+	tx, err := ts.client.db.Begin(true)
+
+	if err != nil {
+		return domain.ErrDelete
+	}
+
+	defer tx.Rollback()
+	b := tx.Bucket([]byte("Todos"))
+
+	err = b.Delete([]byte(strconv.Itoa(id)))
+	if err != nil {
+		return domain.ErrDelete
+	}
+
+	return tx.Commit()
 }

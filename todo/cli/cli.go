@@ -2,6 +2,7 @@ package cli
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/Tinee/gophercises/todo/domain"
@@ -9,7 +10,7 @@ import (
 
 type Action struct {
 	Kind string
-	Todo domain.Todo
+	Arg  string
 }
 
 type Cli struct {
@@ -32,36 +33,59 @@ func NewCli(
 }
 
 // Exectue exectues the action we provided.
-func (c *Cli) Exectue(a Action) error {
-	switch strings.ToLower(a.Kind) {
+func (c *Cli) Exectue() error {
+	switch strings.ToLower(c.Kind) {
 	case "list":
-		todos, err := c.s.All()
-		if err != nil {
-			return domain.ErrGetAll
-		}
-		c.logTodoList(todos)
+		c.handleList()
 	case "create":
-
-		err := c.s.Create(c.Todo)
-		if err != nil {
-			return domain.ErrCreate
-		}
-		c.log.Printf("Todo successfully created")
+		c.handleCreate()
 	case "do":
-		err := c.s.Delete(c.Todo.ID)
-		if err != nil {
-			return domain.ErrCreate
-		}
-
-		c.log.Printf("Todo successfully removed")
+		c.handleDo()
 	default:
 		return domain.ErrInvalidAction
 	}
-	return domain.ErrInvalidAction
+
+	return nil
 }
 
-func (c *Cli) logTodoList(t []domain.Todo) {
-	for _, v := range t {
+func (c *Cli) handleList() error {
+	todos, err := c.s.All()
+	if err != nil {
+		return domain.ErrGetAll
+	}
+
+	for _, v := range todos {
 		c.log.Printf("%v. %v\n", v.ID, v.Message)
 	}
+
+	return nil
+}
+
+func (c *Cli) handleDo() error {
+	id, err := strconv.Atoi(c.Arg)
+	if err != nil {
+		c.log.Fatal("Error: invalid argument")
+	}
+
+	err = c.s.Delete(id)
+	if err != nil {
+		return domain.ErrDelete
+	}
+
+	c.log.Printf("Successfully deleted the todo with id %v", id)
+	return nil
+}
+
+func (c *Cli) handleCreate() error {
+	err := c.s.Create(domain.Todo{
+		Message: c.Arg,
+	})
+
+	if err != nil {
+		return domain.ErrCreate
+	}
+
+	c.log.Printf("Successfully added the todo \"%v\"", c.Arg)
+
+	return nil
 }

@@ -25,7 +25,12 @@ type TodoService interface {
 
 // Error's that the data store can produce.
 var (
-	ErrGetAll        = errors.New("something went wrong when getting the todos")
-	ErrCreate        = errors.New("something went when attempting to create the todo")
+	ErrGetAll = errors.New("something bad happened when we tried to get all todos")
+	ErrCreate = errors.New("something bad happened when we tried to create that todo")
+	ErrDelete = errors.New("something bad happened when we tried to delete that todo")
+)
+
+// Error's that can happened in the cli.
+var (
 	ErrInvalidAction = errors.New("this is not a valid action")
 )
