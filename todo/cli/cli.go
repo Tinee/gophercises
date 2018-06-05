@@ -1,7 +1,9 @@
 package cli
 
 import (
-	"log"
+	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -14,22 +16,16 @@ type Action struct {
 }
 
 type Cli struct {
-	s   domain.TodoService
-	log *log.Logger
+	s domain.TodoService
+	w io.Writer
 	Action
 }
 
-func New(
-	s domain.TodoService,
-	l *log.Logger,
-	a Action,
-) *Cli {
-
-	return &Cli{
-		s,
-		l,
-		a,
+func New(w io.Writer, a Action, s domain.TodoService) *Cli {
+	if w == nil {
+		w = os.Stdout
 	}
+	return &Cli{s, w, a}
 }
 
 // Exectue exectues the action we provided.
@@ -53,7 +49,7 @@ func (c *Cli) handleList() error {
 	}
 
 	for _, v := range todos {
-		c.log.Printf("%v. %v\n", v.ID, v.Message)
+		fmt.Fprintf(c.w, "%v. %v\n", v.ID, v.Message)
 	}
 
 	return nil
@@ -62,7 +58,7 @@ func (c *Cli) handleList() error {
 func (c *Cli) handleDo() error {
 	id, err := strconv.Atoi(c.Arg)
 	if err != nil {
-		c.log.Println("Error: invalid argument")
+		fmt.Fprintln(c.w, "Error: invalid argument")
 		return err
 	}
 
@@ -71,7 +67,7 @@ func (c *Cli) handleDo() error {
 		return domain.ErrDelete
 	}
 
-	c.log.Printf("Successfully deleted the todo with id %v", id)
+	fmt.Fprintf(c.w, "Successfully completed the todo with id %v", id)
 	return nil
 }
 
@@ -84,7 +80,6 @@ func (c *Cli) handleCreate() error {
 		return domain.ErrCreate
 	}
 
-	c.log.Printf("Successfully added the todo \"%v\"", c.Arg)
-
+	fmt.Fprintf(c.w, "Successfully added the todo \"%v\"", c.Arg)
 	return nil
 }

@@ -2,7 +2,7 @@ package cli
 
 import (
 	"bytes"
-	"log"
+	"io"
 	"testing"
 
 	"github.com/Tinee/gophercises/todo/mocks"
@@ -11,28 +11,25 @@ import (
 )
 
 func TestCli_Exectue(t *testing.T) {
-	var (
-		buf bytes.Buffer
-		l   = log.New(&buf, "", 0)
-	)
+	var b bytes.Buffer
 
 	tests := []struct {
 		name    string
-		log     *log.Logger
+		w       io.Writer
 		wantErr bool
 		Action  Action
 		prepare func(*mock.TodoService)
 	}{
 		{
 			"Should fail if we pass down an invalid argument",
-			l,
+			&b,
 			true,
 			Action{Kind: "this is an invalid argument"},
 			func(svc *mock.TodoService) {},
 		},
 		{
 			"Should not throw any errors and output some items to the loggers writer.",
-			l,
+			&b,
 			false,
 			Action{Arg: "", Kind: "list"},
 			func(svc *mock.TodoService) {
@@ -43,14 +40,14 @@ func TestCli_Exectue(t *testing.T) {
 		},
 		{
 			"Should error out because of an invalid argument, it's need to be an int.",
-			l,
+			&b,
 			true,
 			Action{Arg: "asdThisShouldFail", Kind: "do"},
 			func(svc *mock.TodoService) {},
 		},
 		{
 			"Should error out because TodoService.Delete returns an error.",
-			l,
+			&b,
 			true,
 			Action{Arg: "1", Kind: "do"},
 			func(svc *mock.TodoService) {
@@ -61,7 +58,7 @@ func TestCli_Exectue(t *testing.T) {
 		},
 		{
 			"Should not fail when a successful do commands occurs",
-			l,
+			&b,
 			false,
 			Action{Arg: "1", Kind: "do"},
 			func(svc *mock.TodoService) {
@@ -72,7 +69,7 @@ func TestCli_Exectue(t *testing.T) {
 		},
 		{
 			"Should not fail when a successful create command occurs",
-			l,
+			&b,
 			false,
 			Action{Kind: "create"},
 			func(svc *mock.TodoService) {
@@ -83,7 +80,7 @@ func TestCli_Exectue(t *testing.T) {
 		},
 		{
 			"Should fail if TodoService.Create errors out",
-			l,
+			&b,
 			true,
 			Action{Kind: "create"},
 			func(svc *mock.TodoService) {
@@ -96,13 +93,14 @@ func TestCli_Exectue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			todoSvcMock := mock.TodoService{}
 			tt.prepare(&todoSvcMock)
 
 			c := New(
-				todoSvcMock,
-				tt.log,
+				tt.w,
 				tt.Action,
+				todoSvcMock,
 			)
 
 			if err := c.Exectue(); (err != nil) != tt.wantErr {

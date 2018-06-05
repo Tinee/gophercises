@@ -17,7 +17,6 @@ func main() {
 		action = flag.Arg(0)
 		arg    = flag.Arg(1)
 		c      = bolt.NewClient("todo.db")
-		logger = log.New(os.Stdout, "", 0)
 	)
 
 	err = c.Open()
@@ -26,13 +25,13 @@ func main() {
 		log.Fatalf("Error while opening a bolt connection: %v", err)
 	}
 
-	err = cli.NewCli(
-		c.TodoService(),
-		logger,
+	err = cli.New(
+		os.Stdout,
 		cli.Action{
 			Kind: action,
 			Arg:  arg,
 		},
+		c.TodoService(),
 	).Exectue()
 
 	if err != nil {
