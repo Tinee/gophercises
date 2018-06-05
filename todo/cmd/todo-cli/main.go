@@ -19,8 +19,9 @@ func main() {
 		c      = bolt.NewClient("todo.db")
 		logger = log.New(os.Stdout, "", 0)
 	)
-	defer c.Close()
+
 	err = c.Open()
+	defer c.Close()
 	if err != nil {
 		log.Fatalf("Error while opening a bolt connection: %v", err)
 	}

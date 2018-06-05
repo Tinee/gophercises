@@ -3,7 +3,6 @@ package bolt
 import (
 	"bytes"
 	"encoding/json"
-	"strconv"
 
 	"github.com/Tinee/gophercises/todo/domain"
 )
@@ -75,7 +74,7 @@ func (ts TodoService) Delete(id int) error {
 	defer tx.Rollback()
 	b := tx.Bucket([]byte("Todos"))
 
-	err = b.Delete([]byte(strconv.Itoa(id)))
+	err = b.Delete([]byte(itob(id)))
 	if err != nil {
 		return domain.ErrDelete
 	}
